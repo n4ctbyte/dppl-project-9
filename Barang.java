@@ -1,3 +1,4 @@
+//Class Barang
 public class Barang {
     private String kode;
     private String nama;
