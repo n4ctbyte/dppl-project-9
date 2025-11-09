@@ -1,6 +1,6 @@
-// file ini dibuat oleh nakata
+//kelompok 9
 public class Main {
     public static void main(String[] args) {
-        System.err.println("Test");
+        System.err.println("Hello");
     }
 }
