@@ -1,0 +1,20 @@
+[
+  {
+    "email": "admin@admin.unri.ac.id",
+    "password": "admin123",
+    "role": "ADMIN",
+    "nama": "Administrator SIUR"
+  },
+  {
+    "email": "nakata.christian2366@student.unri.ac.id",
+    "password": "Nakata2366!",
+    "role": "USER",
+    "nama": "Nakata Christian"
+  },
+  {
+    "email": "test",
+    "password": "test",
+    "role": "USER",
+    "nama": "Nakata Christian"
+  }
+]
