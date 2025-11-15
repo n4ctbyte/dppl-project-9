@@ -1,3 +1,4 @@
+package app;
 //Class Barang
 public class Barang {
     private String kode;
