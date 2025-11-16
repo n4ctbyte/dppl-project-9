@@ -3,8 +3,9 @@ package app;
 import app.service.AuthService;
 import app.view.HalamanInventaris;
 import app.view.HalamanLogin;
-import javafx.animation.FillTransition;
+import app.view.HalamanRiwayat;
 import javafx.application.Application;
+import javafx.animation.FillTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -29,8 +30,8 @@ public class SiurApp extends Application {
 
     private HalamanLogin halamanLogin;
     private HalamanInventaris halamanInventaris;
+    private HalamanRiwayat halamanRiwayat;
     
-    private Node halamanRiwayat;
     private Node halamanKelola;
     private Node halamanStatistik;
 
@@ -43,8 +44,8 @@ public class SiurApp extends Application {
 
         this.halamanLogin = new HalamanLogin(this);
         this.halamanInventaris = new HalamanInventaris(this);
+        this.halamanRiwayat = new HalamanRiwayat(this);
         
-        this.halamanRiwayat = createPlaceholderPage("Halaman Riwayat");
         this.halamanKelola = createPlaceholderPage("Halaman Kelola Barang");
         this.halamanStatistik = createPlaceholderPage("Halaman Statistik");
 
@@ -79,7 +80,7 @@ public class SiurApp extends Application {
         Button btnStatistik = createNavButton("Statistik");
         
         btnInventaris.setOnAction(e -> showInventarisPage());
-        btnRiwayat.setOnAction(e -> rootLayout.setCenter(halamanRiwayat));
+        btnRiwayat.setOnAction(e -> showRiwayatPage());
         btnKelola.setOnAction(e -> rootLayout.setCenter(halamanKelola));
         btnStatistik.setOnAction(e -> rootLayout.setCenter(halamanStatistik));
 
@@ -120,6 +121,12 @@ public class SiurApp extends Application {
     public void showInventarisPage() {
         rootLayout.setLeft(createSidebar());
         rootLayout.setCenter(halamanInventaris.getView());
+    }
+    
+    public void showRiwayatPage() {
+        rootLayout.setLeft(createSidebar());
+        halamanRiwayat.loadRiwayatData();
+        rootLayout.setCenter(halamanRiwayat.getView());
     }
 
     private Node createPlaceholderPage(String title) {

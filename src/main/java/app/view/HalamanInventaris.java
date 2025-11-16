@@ -7,6 +7,7 @@ import app.model.User;
 import app.service.AuthService;
 import app.service.InventarisService;
 import app.service.PeminjamanService;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import javafx.animation.ScaleTransition;
@@ -23,6 +24,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -30,6 +33,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
@@ -82,7 +86,7 @@ public class HalamanInventaris {
         Button kembalikanButton = new Button("Kembalikan Barang");
         kembalikanButton.setStyle(styleButtonKembali);
         kembalikanButton.setOnAction(e -> showReturnDialog());
-        setupButtonInvertAnimation(kembalikanButton, 1.05, styleButtonKembali, styleButtonKembaliHover);
+        setupButtonHoverEffect(kembalikanButton, 1.05, styleButtonKembali, styleButtonKembaliHover);
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -90,7 +94,7 @@ public class HalamanInventaris {
         Button logoutButton = new Button("Logout");
         logoutButton.setStyle(styleButtonLogout);
         logoutButton.setOnAction(e -> mainApp.doLogout());
-        setupButtonInvertAnimation(logoutButton, 1.05, styleButtonLogout, styleButtonLogoutHover);
+        setupButtonHoverEffect(logoutButton, 1.05, styleButtonLogout, styleButtonLogoutHover);
 
         topBar.getChildren().addAll(title, searchBox, kembalikanButton, spacer, logoutButton);
         
@@ -116,20 +120,7 @@ public class HalamanInventaris {
         return contentContainer;
     }
     
-    private void setupButtonScaleAnimation(Node node, double scale) {
-        ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
-        stIn.setToX(scale);
-        stIn.setToY(scale);
-        
-        ScaleTransition stOut = new ScaleTransition(Duration.millis(150), node);
-        stOut.setToX(1.0);
-        stOut.setToY(1.0);
-        
-        node.setOnMouseEntered(e -> stIn.playFromStart());
-        node.setOnMouseExited(e -> stOut.playFromStart());
-    }
-    
-    private void setupButtonInvertAnimation(Node node, double scale, String styleIdle, String styleHover) {
+    private void setupButtonHoverEffect(Node node, double scale, String styleIdle, String styleHover) {
         ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
         stIn.setToX(scale);
         stIn.setToY(scale);
@@ -174,13 +165,74 @@ public class HalamanInventaris {
         return searchContainer;
     }
 
-    private VBox createItemCard(Barang barang) {
-        VBox card = new VBox(8);
-        card.setMinWidth(320);
-        card.setMaxWidth(320);
+    private Node createImageNode(Barang barang) {
+        String imgPath = barang.getPathGambar();
+        Node imageNode;
+
+        if (imgPath != null && !imgPath.isEmpty()) {
+            try (InputStream is = getClass().getResourceAsStream("/" + imgPath)) {
+                if (is == null) {
+                    System.err.println("Gambar tidak ditemukan: /" + imgPath);
+                    imageNode = createPlaceholder();
+                } else {
+                    Image img = new Image(is);
+                    ImageView imageView = new ImageView(img);
+                    imageView.setFitWidth(80);
+                    imageView.setFitHeight(80);
+                    imageView.setPreserveRatio(true);
+                    imageNode = imageView;
+                }
+            } catch (Exception e) {
+                System.err.println("Gagal memuat gambar: " + imgPath);
+                imageNode = createPlaceholder();
+            }
+        } else {
+            imageNode = createPlaceholder();
+        }
+        
+        return imageNode;
+    }
+
+    private Node createPlaceholder() {
+        Rectangle placeholder = new Rectangle(80, 80);
+        placeholder.setFill(Color.web("#EEEEEE"));
+        placeholder.setArcWidth(12);
+        placeholder.setArcHeight(12);
+        return placeholder;
+    }
+    
+    private HBox createStockBox(Barang barang) {
+        HBox stockBox = new HBox();
+        stockBox.setPadding(new Insets(6, 12, 6, 12));
+        
+        String stockColor;
+        if (barang.getStok() > 15) {
+            stockColor = "#D4EDDA";
+        } else if (barang.getStok() > 5) {
+            stockColor = "#FFF3CD";
+        } else {
+            stockColor = "#F8D7DA";
+        }
+
+        stockBox.setStyle("-fx-background-color: " + stockColor + "; -fx-background-radius: 8;");
+        stockBox.setMaxWidth(120);
+
+        Label stockLabel = new Label("Stok : " + barang.getStok());
+        stockLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        stockLabel.setTextFill(Color.BLACK);
+        stockBox.getChildren().add(stockLabel);
+        
+        return stockBox;
+    }
+
+    private HBox createItemCard(Barang barang) {
+        HBox card = new HBox(15);
+        card.setMinWidth(380);
+        card.setMaxWidth(380);
         card.setMinHeight(100);
         card.setPadding(new Insets(15));
         card.setStyle(styleCard);
+        card.setAlignment(Pos.CENTER_LEFT);
 
         ScaleTransition stIn = new ScaleTransition(Duration.millis(150), card);
         stIn.setToX(1.03);
@@ -199,49 +251,32 @@ public class HalamanInventaris {
             stOut.playFromStart();
         });
 
-        HBox topRow = new HBox();
-        topRow.setAlignment(Pos.CENTER_LEFT);
+        Node imageNode = createImageNode(barang);
 
+        VBox infoBox = new VBox(8);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
+        
         Label nameLabel = new Label(barang.getNama());
-        nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         nameLabel.setWrapText(true);
         nameLabel.setTextFill(Color.BLACK);
-        nameLabel.setMaxWidth(180);
+        
+        HBox stockBox = createStockBox(barang);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Region vSpacer = new Region();
+        VBox.setVgrow(vSpacer, Priority.ALWAYS);
 
         Button pinjamButton = new Button("Pinjam");
         pinjamButton.setPrefSize(100, 38);
         pinjamButton.setStyle(styleButtonPinjam);
-        setupButtonScaleAnimation(pinjamButton, 1.08);
-
+        setupButtonHoverEffect(pinjamButton, 1.08, styleButtonPinjam, styleButtonPinjam);
         pinjamButton.setOnAction(e -> showBorrowForm(barang));
+        
+        VBox.setMargin(pinjamButton, new Insets(5, 0, 0, 0));
+        
+        infoBox.getChildren().addAll(nameLabel, stockBox, vSpacer, pinjamButton);
 
-        topRow.getChildren().addAll(nameLabel, spacer, pinjamButton);
-        topRow.setAlignment(Pos.TOP_LEFT);
-
-        HBox stockBox = new HBox();
-        stockBox.setPadding(new Insets(6, 12, 6, 12));
-
-        String stockColor;
-        if (barang.getStok() > 15) {
-            stockColor = "#D4EDDA";
-        } else if (barang.getStok() > 5) {
-            stockColor = "#FFF3CD";
-        } else {
-            stockColor = "#F8D7DA";
-        }
-
-        stockBox.setStyle("-fx-background-color: " + stockColor + "; -fx-background-radius: 8;");
-        stockBox.setMaxWidth(120);
-
-        Label stockLabel = new Label("Stok : " + barang.getStok());
-        stockLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        stockLabel.setTextFill(Color.BLACK);
-        stockBox.getChildren().add(stockLabel);
-
-        card.getChildren().addAll(topRow, stockBox);
+        card.getChildren().addAll(imageNode, infoBox);
 
         return card;
     }
@@ -395,7 +430,7 @@ public class HalamanInventaris {
         barangComboBox.setOnAction(e -> {
             Peminjaman selected = barangComboBox.getValue();
             if (selected != null) {
-                jumlahField.setPromptText("Jumlah (Maks: " + selected.getJumlah() + ")");
+                jumlahField.setPromptText("Jumlah (Maks: " + selected.getJumlahSisa() + ")");
             }
         });
 
@@ -440,20 +475,15 @@ public class HalamanInventaris {
                 return;
             }
             
-            if (jumlah > peminjamanDipilih.getJumlah() || jumlah <= 0) {
+            if (jumlah > peminjamanDipilih.getJumlahSisa() || jumlah <= 0) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah pengembalian tidak valid.");
                 return;
             }
             
-            boolean success = peminjamanService.kembalikanPeminjaman(peminjamanDipilih, jumlah, catatanPengembalian);
-
-            if (success) {
-                inventarisService.kembalikanBarang(peminjamanDipilih.getBarang(), jumlah);
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Berhasil mengembalikan " + jumlah + " unit " + peminjamanDipilih.getBarang().getNama() + "!");
-                filterInventory(searchField.getText());
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah pengembalian lebih besar dari yang dipinjam.");
-            }
+            peminjamanService.kembalikanPeminjaman(peminjamanDipilih, jumlah, catatanPengembalian);
+            inventarisService.kembalikanBarang(peminjamanDipilih.getBarang(), jumlah);
+            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Berhasil mengembalikan " + jumlah + " unit " + peminjamanDipilih.getBarang().getNama() + "!");
+            filterInventory(searchField.getText());
         }
     }
 

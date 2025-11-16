@@ -1,62 +1,62 @@
 [
-  {
-    "kode": "P-001",
-    "nama": "Proyektor",
-    "stok": 5,
-    "pathGambar": ""
-  },
-  {
-    "kode": "S-001",
-    "nama": "Spidol Hitam",
-    "stok": 25,
-    "pathGambar": ""
-  },
-  {
-    "kode": "S-002",
-    "nama": "Spidol Merah",
-    "stok": 20,
-    "pathGambar": ""
-  },
-  {
-    "kode": "W-001",
-    "nama": "Whiteboard",
-    "stok": 8,
-    "pathGambar": ""
-  },
-  {
-    "kode": "L-001",
-    "nama": "Laptop Dell",
-    "stok": 10,
-    "pathGambar": ""
-  },
-  {
-    "kode": "M-001",
-    "nama": "Mouse Wireless",
-    "stok": 30,
-    "pathGambar": ""
-  },
-  {
-    "kode": "K-001",
-    "nama": "Keyboard Mechanical",
-    "stok": 15,
-    "pathGambar": ""
-  },
-  {
-    "kode": "P-002",
-    "nama": "Printer Canon",
-    "stok": 6,
-    "pathGambar": ""
-  },
-  {
-    "kode": "S-003",
-    "nama": "Scanner",
-    "stok": 4,
-    "pathGambar": ""
-  },
-  {
-    "kode": "H-001",
-    "nama": "Kabel HDMI",
-    "stok": 18,
-    "pathGambar": ""
-  }
+    {
+        "kode": "FEB-ELK-001",
+        "nama": "Scanner",
+        "stok": 4,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FKIP-ELK-001",
+        "nama": "Printer",
+        "stok": 6,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ATK-001",
+        "nama": "Spidol Hitam",
+        "stok": 25,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ATK-002",
+        "nama": "Spidol Merah",
+        "stok": 20,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ATK-003",
+        "nama": "Penghapus",
+        "stok": 8,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ELK-001",
+        "nama": "Proyektor",
+        "stok": 5,
+        "pathGambar": "images/proyektor.png"
+    },
+    {
+        "kode": "FT-ELK-002",
+        "nama": "Laptop",
+        "stok": 10,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ELK-003",
+        "nama": "Mouse Wireless",
+        "stok": 30,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ELK-004",
+        "nama": "Keyboard",
+        "stok": 15,
+        "pathGambar": ""
+    },
+    {
+        "kode": "FT-ELK-007",
+        "nama": "Kabel HDMI",
+        "stok": 18,
+        "pathGambar": ""
+    }
 ]

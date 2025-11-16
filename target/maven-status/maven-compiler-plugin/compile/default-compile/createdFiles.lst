@@ -1,10 +1,12 @@
 app\service\AuthService$1.class
+app\view\HalamanRiwayat.class
 app\service\PeminjamanService.class
 app\model\Peminjaman.class
 app\SiurApp.class
 app\model\Barang.class
 app\service\InventarisService.class
 app\view\HalamanLogin.class
+app\service\PeminjamanService$1.class
 app\view\HalamanInventaris.class
 app\model\User.class
 app\service\AuthService.class
