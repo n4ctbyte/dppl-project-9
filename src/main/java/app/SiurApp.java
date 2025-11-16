@@ -3,6 +3,7 @@ package app;
 import app.service.AuthService;
 import app.view.HalamanInventaris;
 import app.view.HalamanLogin;
+import javafx.animation.FillTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class SiurApp extends Application {
 
@@ -47,6 +49,7 @@ public class SiurApp extends Application {
         this.halamanStatistik = createPlaceholderPage("Halaman Statistik");
 
         this.rootLayout = new BorderPane();
+        this.rootLayout.setStyle("-fx-background-color: #f5f7fa;");
 
         showLoginPage();
 
@@ -59,12 +62,15 @@ public class SiurApp extends Application {
     private Node createSidebar() {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(20));
-        sidebar.setStyle("-fx-background-color: #2E3348;");
-        sidebar.setMinWidth(220);
+        sidebar.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 2, 4);");
+        sidebar.setMinWidth(240);
+        sidebar.setMaxWidth(240);
+        
+        BorderPane.setMargin(sidebar, new Insets(15));
 
         Label title = new Label("SIUR");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        title.setTextFill(Color.WHITE);
+        title.setTextFill(Color.web("#2E3348"));
         VBox.setMargin(title, new Insets(0, 0, 20, 0));
 
         Button btnInventaris = createNavButton("Inventaris");
@@ -83,17 +89,6 @@ public class SiurApp extends Application {
             sidebar.getChildren().addAll(btnKelola, btnStatistik);
         }
 
-        Region spacer = new Region();
-        VBox.setVgrow(spacer, Priority.ALWAYS);
-
-        Button btnLogout = createNavButton("Logout");
-        btnLogout.setStyle("-fx-background-color: #D32F2F; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8;");
-        btnLogout.setOnAction(e -> {
-            authService.logout();
-            showLoginPage();
-        });
-
-        sidebar.getChildren().addAll(spacer, btnLogout);
         return sidebar;
     }
     
@@ -101,21 +96,25 @@ public class SiurApp extends Application {
         Button button = new Button(text);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
-        button.setStyle(
-            "-fx-background-color: transparent; -fx-text-fill: #A9B1D6; -fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8;"
-        );
-        button.setOnMouseEntered(e -> button.setStyle(
-            "-fx-background-color: #414868; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8;"
-        ));
-        button.setOnMouseExited(e -> button.setStyle(
-            "-fx-background-color: transparent; -fx-text-fill: #A9B1D6; -fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8;"
-        ));
+        
+        String styleIdle = "-fx-background-color: #F8F8F8; -fx-background-radius: 8; -fx-text-fill: #2E3348; -fx-font-size: 14px; -fx-padding: 10; -fx-alignment: center-left; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 1, 1);";
+        String styleHover = "-fx-background-color: #E3F2FD; -fx-background-radius: 8; -fx-text-fill: #0B5ED7; -fx-font-size: 14px; -fx-padding: 10; -fx-alignment: center-left; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 1, 1); -fx-font-weight: bold;";
+
+        button.setStyle(styleIdle);
+        button.setOnMouseEntered(e -> button.setStyle(styleHover));
+        button.setOnMouseExited(e -> button.setStyle(styleIdle));
+        
         return button;
     }
 
     public void showLoginPage() {
         rootLayout.setLeft(null);
         rootLayout.setCenter(halamanLogin.getView());
+    }
+    
+    public void doLogout() {
+        authService.logout();
+        showLoginPage();
     }
 
     public void showInventarisPage() {
@@ -126,7 +125,7 @@ public class SiurApp extends Application {
     private Node createPlaceholderPage(String title) {
         VBox placeholder = new VBox(new Label(title));
         placeholder.setAlignment(Pos.CENTER);
-        placeholder.setStyle("-fx-background-color: #F0F0F0;");
+        placeholder.setStyle("-fx-background-color: #f5f7fa;");
         return placeholder;
     }
 

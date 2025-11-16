@@ -25,7 +25,7 @@ public class InventarisService {
             Gson gson = new Gson();
             Type barangListType = new TypeToken<List<Barang>>(){}.getType();
 
-            InputStream is = getClass().getResourceAsStream("barang.json");
+            InputStream is = getClass().getResourceAsStream("/barang.json");
 
             if (is == null) {
                 System.err.println("File barang.json tidak ditemukan di src/main/resources!");

@@ -12,6 +12,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -72,6 +73,18 @@ public class HalamanLogin {
         passwordField.setPrefHeight(45);
         passwordField.setStyle(
                 "-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 13px; -fx-padding: 10 15 10 15;");
+
+        emailField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                handleLogin();
+            }
+        });
+
+        passwordField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                handleLogin();
+            }
+        });
 
         HBox rememberForgotBox = new HBox();
         rememberForgotBox.setAlignment(Pos.CENTER_LEFT);
@@ -148,8 +161,6 @@ public class HalamanLogin {
         boolean loginSuccess = authService.login(email, password);
 
         if (loginSuccess) {
-            User user = authService.getUserAktif();
-            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Login berhasil!\nSelamat datang, " + user.getNama() + "!");
             mainApp.showInventarisPage();
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Email atau password salah.");

@@ -9,6 +9,7 @@ import app.service.InventarisService;
 import app.service.PeminjamanService;
 import java.util.List;
 import java.util.Optional;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -31,6 +32,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 
 public class HalamanInventaris {
 
@@ -41,12 +43,18 @@ public class HalamanInventaris {
     private FlowPane itemsContainer;
     private TextField searchField;
     
-    private String styleCard = "-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 2, 4);";
-    private String styleCardHover = "-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #4A90E2; -fx-border-width: 1.5; -fx-effect: dropshadow(gaussian, rgba(74,144,226,0.3), 12, 0, 0, 4); -fx-cursor: hand;";
+    private String styleCard = "-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 1, 2);";
+    private String styleCardHover = "-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 2, 4); -fx-cursor: hand;";
     private String styleButtonPinjam = "-fx-background-color: #4A90E2; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(74,144,226,0.4), 8, 0, 1, 2);";
-    private String styleButtonKembali = "-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-padding: 8 12; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 1, 2);";
-    private String styleSearchBox = "-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 5 10 5 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 2);";
+    
+    private String styleButtonKembali = "-fx-background-color: #18c755; -fx-background-radius: 8; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
+    private String styleButtonKembaliHover = "-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-text-fill: #18c755; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
 
+    private String styleButtonLogout = "-fx-background-color: #D32F2F; -fx-background-radius: 8; -fx-text-fill: #F8F8F8; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
+    private String styleButtonLogoutHover = "-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-text-fill: #D32F2F; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
+
+    private String styleSearchBox = "-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-padding: 5 10 5 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 2);";
+    
     public HalamanInventaris(SiurApp mainApp) {
         this.mainApp = mainApp;
         this.inventarisService = InventarisService.getInstance();
@@ -56,25 +64,41 @@ public class HalamanInventaris {
 
     public Node getView() {
         VBox contentContainer = new VBox(20);
-        contentContainer.setPadding(new Insets(25));
-        contentContainer.setStyle("-fx-background-color: #fafafa;");
+        contentContainer.setPadding(new Insets(15));
+        contentContainer.setStyle("-fx-background-color: #f5f7fa;");
 
         HBox topBar = new HBox(10);
         topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(15));
+        topBar.setMinHeight(85);
+        topBar.setStyle("-fx-background-color: #E3F2FD; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 2, 4);");
         
         Label title = new Label("Daftar Inventaris");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        HBox.setMargin(title, new Insets(0, 15, 0, 0));
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox searchBox = createSearchBox();
 
         Button kembalikanButton = new Button("Kembalikan Barang");
         kembalikanButton.setStyle(styleButtonKembali);
-
         kembalikanButton.setOnAction(e -> showReturnDialog());
+        setupButtonInvertAnimation(kembalikanButton, 1.05, styleButtonKembali, styleButtonKembaliHover);
+        
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox searchBox = createSearchBox();
-        topBar.getChildren().addAll(title, spacer, kembalikanButton, searchBox);
+        Button logoutButton = new Button("Logout");
+        logoutButton.setStyle(styleButtonLogout);
+        logoutButton.setOnAction(e -> mainApp.doLogout());
+        setupButtonInvertAnimation(logoutButton, 1.05, styleButtonLogout, styleButtonLogoutHover);
+
+        topBar.getChildren().addAll(title, searchBox, kembalikanButton, spacer, logoutButton);
+        
+        User user = authService.getUserAktif();
+        Label welcomeLabel = new Label("Selamat datang, " + user.getNama() + "!");
+        welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 22));
+        welcomeLabel.setTextFill(Color.web("#333333"));
+        VBox.setMargin(welcomeLabel, new Insets(5, 0, 0, 5));
         
         itemsContainer = new FlowPane(20, 20);
         itemsContainer.setAlignment(Pos.TOP_LEFT);
@@ -82,14 +106,46 @@ public class HalamanInventaris {
         ScrollPane scrollPane = new ScrollPane(itemsContainer);
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-        scrollPane.setPadding(new Insets(5));
+        scrollPane.setPadding(new Insets(20, 5, 5, 5));
 
-        contentContainer.getChildren().addAll(topBar, scrollPane);
+        contentContainer.getChildren().addAll(topBar, welcomeLabel, scrollPane);
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
         
         refreshInventoryList();
         
         return contentContainer;
+    }
+    
+    private void setupButtonScaleAnimation(Node node, double scale) {
+        ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
+        stIn.setToX(scale);
+        stIn.setToY(scale);
+        
+        ScaleTransition stOut = new ScaleTransition(Duration.millis(150), node);
+        stOut.setToX(1.0);
+        stOut.setToY(1.0);
+        
+        node.setOnMouseEntered(e -> stIn.playFromStart());
+        node.setOnMouseExited(e -> stOut.playFromStart());
+    }
+    
+    private void setupButtonInvertAnimation(Node node, double scale, String styleIdle, String styleHover) {
+        ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
+        stIn.setToX(scale);
+        stIn.setToY(scale);
+        
+        ScaleTransition stOut = new ScaleTransition(Duration.millis(150), node);
+        stOut.setToX(1.0);
+        stOut.setToY(1.0);
+        
+        node.setOnMouseEntered(e -> {
+            node.setStyle(styleHover);
+            stIn.playFromStart();
+        });
+        node.setOnMouseExited(e -> {
+            node.setStyle(styleIdle);
+            stOut.playFromStart();
+        });
     }
 
     private HBox createSearchBox() {
@@ -126,8 +182,22 @@ public class HalamanInventaris {
         card.setPadding(new Insets(15));
         card.setStyle(styleCard);
 
-        card.setOnMouseEntered(e -> card.setStyle(styleCardHover));
-        card.setOnMouseExited(e -> card.setStyle(styleCard));
+        ScaleTransition stIn = new ScaleTransition(Duration.millis(150), card);
+        stIn.setToX(1.03);
+        stIn.setToY(1.03);
+        
+        ScaleTransition stOut = new ScaleTransition(Duration.millis(150), card);
+        stOut.setToX(1.0);
+        stOut.setToY(1.0);
+
+        card.setOnMouseEntered(e -> {
+            card.setStyle(styleCardHover);
+            stIn.playFromStart();
+        });
+        card.setOnMouseExited(e -> {
+            card.setStyle(styleCard);
+            stOut.playFromStart();
+        });
 
         HBox topRow = new HBox();
         topRow.setAlignment(Pos.CENTER_LEFT);
@@ -144,6 +214,7 @@ public class HalamanInventaris {
         Button pinjamButton = new Button("Pinjam");
         pinjamButton.setPrefSize(100, 38);
         pinjamButton.setStyle(styleButtonPinjam);
+        setupButtonScaleAnimation(pinjamButton, 1.08);
 
         pinjamButton.setOnAction(e -> showBorrowForm(barang));
 
@@ -241,6 +312,9 @@ public class HalamanInventaris {
         grid.add(alasan, 1, 4);
 
         dialog.getDialogPane().setContent(grid);
+        
+        Button pinjamButton = (Button) dialog.getDialogPane().lookupButton(btnTipePinjam);
+        pinjamButton.setDefaultButton(true);
 
         Optional<ButtonType> result = dialog.showAndWait();
 
@@ -337,6 +411,9 @@ public class HalamanInventaris {
         grid.add(catatan, 1, 4);
 
         dialog.getDialogPane().setContent(grid);
+        
+        Button kembalikanButton = (Button) dialog.getDialogPane().lookupButton(btnTipeKembalikan);
+        kembalikanButton.setDefaultButton(true);
 
         Optional<ButtonType> result = dialog.showAndWait();
 
