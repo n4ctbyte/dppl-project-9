@@ -2,12 +2,13 @@ package app;
 
 import app.service.AuthService;
 import app.view.HalamanInventaris;
+import app.view.HalamanKelolaBarang;
 import app.view.HalamanLogin;
 import app.view.HalamanRiwayat;
-import javafx.application.Application;
-import javafx.animation.FillTransition;
+import app.view.HalamanStatistik;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,7 +21,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class SiurApp extends Application {
 
@@ -31,9 +31,8 @@ public class SiurApp extends Application {
     private HalamanLogin halamanLogin;
     private HalamanInventaris halamanInventaris;
     private HalamanRiwayat halamanRiwayat;
-    
-    private Node halamanKelola;
-    private Node halamanStatistik;
+    private HalamanKelolaBarang halamanKelolaBarang;
+    private HalamanStatistik halamanStatistik;
 
     @Override
     public void start(Stage primaryStage) {
@@ -45,9 +44,8 @@ public class SiurApp extends Application {
         this.halamanLogin = new HalamanLogin(this);
         this.halamanInventaris = new HalamanInventaris(this);
         this.halamanRiwayat = new HalamanRiwayat(this);
-        
-        this.halamanKelola = createPlaceholderPage("Halaman Kelola Barang");
-        this.halamanStatistik = createPlaceholderPage("Halaman Statistik");
+        this.halamanKelolaBarang = new HalamanKelolaBarang(this);
+        this.halamanStatistik = new HalamanStatistik(this);
 
         this.rootLayout = new BorderPane();
         this.rootLayout.setStyle("-fx-background-color: #f5f7fa;");
@@ -66,7 +64,6 @@ public class SiurApp extends Application {
         sidebar.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 2, 4);");
         sidebar.setMinWidth(240);
         sidebar.setMaxWidth(240);
-        
         BorderPane.setMargin(sidebar, new Insets(15));
 
         Label title = new Label("SIUR");
@@ -81,8 +78,8 @@ public class SiurApp extends Application {
         
         btnInventaris.setOnAction(e -> showInventarisPage());
         btnRiwayat.setOnAction(e -> showRiwayatPage());
-        btnKelola.setOnAction(e -> rootLayout.setCenter(halamanKelola));
-        btnStatistik.setOnAction(e -> rootLayout.setCenter(halamanStatistik));
+        btnKelola.setOnAction(e -> rootLayout.setCenter(halamanKelolaBarang.getView()));
+        btnStatistik.setOnAction(e -> rootLayout.setCenter(halamanStatistik.getView()));
 
         sidebar.getChildren().addAll(btnInventaris, btnRiwayat);
 
@@ -97,14 +94,11 @@ public class SiurApp extends Application {
         Button button = new Button(text);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
-        
         String styleIdle = "-fx-background-color: #F8F8F8; -fx-background-radius: 8; -fx-text-fill: #2E3348; -fx-font-size: 14px; -fx-padding: 10; -fx-alignment: center-left; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 1, 1);";
         String styleHover = "-fx-background-color: #E3F2FD; -fx-background-radius: 8; -fx-text-fill: #0B5ED7; -fx-font-size: 14px; -fx-padding: 10; -fx-alignment: center-left; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 1, 1); -fx-font-weight: bold;";
-
         button.setStyle(styleIdle);
         button.setOnMouseEntered(e -> button.setStyle(styleHover));
         button.setOnMouseExited(e -> button.setStyle(styleIdle));
-        
         return button;
     }
 
@@ -127,13 +121,6 @@ public class SiurApp extends Application {
         rootLayout.setLeft(createSidebar());
         halamanRiwayat.loadRiwayatData();
         rootLayout.setCenter(halamanRiwayat.getView());
-    }
-
-    private Node createPlaceholderPage(String title) {
-        VBox placeholder = new VBox(new Label(title));
-        placeholder.setAlignment(Pos.CENTER);
-        placeholder.setStyle("-fx-background-color: #f5f7fa;");
-        return placeholder;
     }
 
     public static void main(String[] args) {

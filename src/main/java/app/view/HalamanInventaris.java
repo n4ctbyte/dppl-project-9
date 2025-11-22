@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import javafx.animation.ScaleTransition;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -51,11 +52,11 @@ public class HalamanInventaris {
     private String styleCardHover = "-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 2, 4); -fx-cursor: hand;";
     private String styleButtonPinjam = "-fx-background-color: #4A90E2; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(74,144,226,0.4), 8, 0, 1, 2);";
     
-    private String styleButtonKembali = "-fx-background-color: #18c755; -fx-background-radius: 8; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
-    private String styleButtonKembaliHover = "-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-text-fill: #18c755; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
+    private String styleButtonKembali = "-fx-background-color: #18c755; -fx-background-radius: 8; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 8;";
+    private String styleButtonKembaliHover = "-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-text-fill: #18c755; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand; -fx-border-color: #18c755; -fx-border-width: 2; -fx-border-radius: 8;";
 
-    private String styleButtonLogout = "-fx-background-color: #D32F2F; -fx-background-radius: 8; -fx-text-fill: #F8F8F8; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
-    private String styleButtonLogoutHover = "-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-text-fill: #D32F2F; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand;";
+    private String styleButtonLogout = "-fx-background-color: #D32F2F; -fx-background-radius: 8; -fx-text-fill: #F8F8F8; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 8;";
+    private String styleButtonLogoutHover = "-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-text-fill: #D32F2F; -fx-font-size: 14px; -fx-padding: 8 12; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand; -fx-border-color: #D32F2F; -fx-border-width: 2; -fx-border-radius: 8;";
 
     private String styleSearchBox = "-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-padding: 5 10 5 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 2);";
     
@@ -120,6 +121,19 @@ public class HalamanInventaris {
         return contentContainer;
     }
     
+    private void setupButtonScaleAnimation(Node node, double scale) {
+        ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
+        stIn.setToX(scale);
+        stIn.setToY(scale);
+        
+        ScaleTransition stOut = new ScaleTransition(Duration.millis(150), node);
+        stOut.setToX(1.0);
+        stOut.setToY(1.0);
+        
+        node.setOnMouseEntered(e -> stIn.playFromStart());
+        node.setOnMouseExited(e -> stOut.playFromStart());
+    }
+    
     private void setupButtonHoverEffect(Node node, double scale, String styleIdle, String styleHover) {
         ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
         stIn.setToX(scale);
@@ -172,7 +186,6 @@ public class HalamanInventaris {
         if (imgPath != null && !imgPath.isEmpty()) {
             try (InputStream is = getClass().getResourceAsStream("/" + imgPath)) {
                 if (is == null) {
-                    System.err.println("Gambar tidak ditemukan: /" + imgPath);
                     imageNode = createPlaceholder();
                 } else {
                     Image img = new Image(is);
@@ -183,7 +196,6 @@ public class HalamanInventaris {
                     imageNode = imageView;
                 }
             } catch (Exception e) {
-                System.err.println("Gagal memuat gambar: " + imgPath);
                 imageNode = createPlaceholder();
             }
         } else {
@@ -269,7 +281,7 @@ public class HalamanInventaris {
         Button pinjamButton = new Button("Pinjam");
         pinjamButton.setPrefSize(100, 38);
         pinjamButton.setStyle(styleButtonPinjam);
-        setupButtonHoverEffect(pinjamButton, 1.08, styleButtonPinjam, styleButtonPinjam);
+        setupButtonScaleAnimation(pinjamButton, 1.08);
         pinjamButton.setOnAction(e -> showBorrowForm(barang));
         
         VBox.setMargin(pinjamButton, new Insets(5, 0, 0, 0));
@@ -351,9 +363,7 @@ public class HalamanInventaris {
         Button pinjamButton = (Button) dialog.getDialogPane().lookupButton(btnTipePinjam);
         pinjamButton.setDefaultButton(true);
 
-        Optional<ButtonType> result = dialog.showAndWait();
-
-        if (result.isPresent() && result.get() == btnTipePinjam) {
+        pinjamButton.addEventFilter(ActionEvent.ACTION, event -> {
             String jumlahText = jumlahField.getText();
             String alasanPeminjaman = alasan.getText();
             int jumlah;
@@ -362,21 +372,25 @@ public class HalamanInventaris {
                 jumlah = Integer.parseInt(jumlahText);
             } catch (NumberFormatException e) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah harus berupa angka.");
+                event.consume();
                 return;
             }
 
             if (jumlah <= 0) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah peminjaman harus lebih dari 0.");
+                event.consume();
                 return;
             }
 
             if (jumlah > barang.getStok()) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah peminjaman melebihi stok (Stok: " + barang.getStok() + ").");
+                event.consume();
                 return;
             }
             
             if (alasanPeminjaman == null || alasanPeminjaman.trim().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Alasan peminjaman wajib diisi.");
+                event.consume();
                 return;
             }
 
@@ -388,10 +402,13 @@ public class HalamanInventaris {
                 filterInventory(searchField.getText());
             } else {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Stok tidak mencukupi untuk jumlah yang diminta.");
+                event.consume();
             }
-        }
-    }
+        });
 
+        dialog.showAndWait();
+    }
+    
     private void showReturnDialog() {
         User user = authService.getUserAktif();
         List<Peminjaman> pinjamanAktif = peminjamanService.getPeminjamanAktifByUser(user);
@@ -450,12 +467,11 @@ public class HalamanInventaris {
         Button kembalikanButton = (Button) dialog.getDialogPane().lookupButton(btnTipeKembalikan);
         kembalikanButton.setDefaultButton(true);
 
-        Optional<ButtonType> result = dialog.showAndWait();
-
-        if (result.isPresent() && result.get() == btnTipeKembalikan) {
+        kembalikanButton.addEventFilter(ActionEvent.ACTION, event -> {
             Peminjaman peminjamanDipilih = barangComboBox.getValue();
             if (peminjamanDipilih == null) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Anda harus memilih barang.");
+                event.consume();
                 return;
             }
 
@@ -467,24 +483,35 @@ public class HalamanInventaris {
                 jumlah = Integer.parseInt(jumlahText);
             } catch (NumberFormatException e) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah harus berupa angka.");
+                event.consume();
                 return;
             }
 
             if (catatanPengembalian == null || catatanPengembalian.trim().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Catatan wajib diisi.");
+                event.consume();
                 return;
             }
             
             if (jumlah > peminjamanDipilih.getJumlahSisa() || jumlah <= 0) {
                 showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah pengembalian tidak valid.");
+                event.consume();
                 return;
             }
             
-            peminjamanService.kembalikanPeminjaman(peminjamanDipilih, jumlah, catatanPengembalian);
-            inventarisService.kembalikanBarang(peminjamanDipilih.getBarang(), jumlah);
-            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Berhasil mengembalikan " + jumlah + " unit " + peminjamanDipilih.getBarang().getNama() + "!");
-            filterInventory(searchField.getText());
-        }
+            boolean success = peminjamanService.kembalikanPeminjaman(peminjamanDipilih, jumlah, catatanPengembalian);
+
+            if (success) {
+                inventarisService.kembalikanBarang(peminjamanDipilih.getBarang(), jumlah);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Berhasil mengembalikan " + jumlah + " unit " + peminjamanDipilih.getBarang().getNama() + "!");
+                filterInventory(searchField.getText());
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Gagal", "Jumlah pengembalian lebih besar dari yang dipinjam.");
+                event.consume();
+            }
+        });
+
+        dialog.showAndWait();
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

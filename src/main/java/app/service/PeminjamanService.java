@@ -101,7 +101,11 @@ public class PeminjamanService {
                 .collect(Collectors.toList());
     }
 
-    public void kembalikanPeminjaman(Peminjaman peminjaman, int jumlahKembali, String catatan) {
+    public boolean kembalikanPeminjaman(Peminjaman peminjaman, int jumlahKembali, String catatan) {
+        if (jumlahKembali > peminjaman.getJumlahSisa()) {
+            return false;
+        }
+
         int jumlahSisaBaru = peminjaman.getJumlahSisa() - jumlahKembali;
         peminjaman.setJumlahSisa(jumlahSisaBaru);
         
@@ -111,5 +115,6 @@ public class PeminjamanService {
         peminjaman.appendCatatan(catatan);
         
         savePeminjaman();
+        return true;
     }
 }

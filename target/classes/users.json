@@ -16,5 +16,11 @@
     "password": "test",
     "role": "USER",
     "nama": "Nakata Christian"
-  }
+  },
+  {
+    "email": "admin",
+    "password": "admin",
+    "role": "ADMIN",
+    "nama": "Administrator SIUR"
+  } 
 ]
