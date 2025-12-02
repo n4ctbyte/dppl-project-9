@@ -57,7 +57,6 @@ public class HalamanKelolaBarang {
         String styleTambahHover = "-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-text-fill: #4A90E2; -fx-font-size: 14px; -fx-padding: 10 20; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(74,144,226,0.4), 8, 0, 0, 2); -fx-cursor: hand; -fx-border-color: #4A90E2; -fx-border-width: 1.5; -fx-border-radius: 8;";
         
         btnTambah.setStyle(styleTambah);
-        
         setupButtonHoverEffect(btnTambah, 1.05, styleTambah, styleTambahHover);
         
         btnTambah.setOnAction(e -> showFormDialog(null));
@@ -134,7 +133,6 @@ public class HalamanKelolaBarang {
                 pane.setAlignment(Pos.CENTER);
                 
                 String styleEdit = "-fx-background-color: #FFC107; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; -fx-max-width: 35px; -fx-max-height: 35px; -fx-cursor: hand;";
-                
                 String styleHapus = "-fx-background-color: #FF5252; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; -fx-max-width: 35px; -fx-max-height: 35px; -fx-cursor: hand;";
 
                 btnEdit.setStyle(styleEdit);
@@ -169,21 +167,18 @@ public class HalamanKelolaBarang {
         dialog.setHeaderText("Menghapus: " + barang.getNama());
         dialog.setContentText("Masukkan alasan penghapusan (Wajib):");
 
-        // Ambil tombol OK dari dialog
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         
-        // Tambahkan filter agar tidak menutup jika kosong
         okButton.addEventFilter(ActionEvent.ACTION, event -> {
             String alasan = dialog.getEditor().getText();
             if (alasan == null || alasan.trim().isEmpty()) {
-                event.consume(); // Batalkan penutupan dialog
+                event.consume();
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Gagal");
                 alert.setHeaderText(null);
                 alert.setContentText("Alasan penghapusan harus diisi!");
                 alert.show();
             } else {
-                // Logika hapus dijalankan di sini sebelum dialog tutup
                 inventarisService.hapusBarang(barang, alasan, "ADMIN");
                 refreshTable();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -209,7 +204,6 @@ public class HalamanKelolaBarang {
         grid.setVgap(15);
         grid.setPadding(new Insets(20, 50, 10, 10));
 
-        // Komponen Input
         ComboBox<String> comboLokasi = new ComboBox<>();
         comboLokasi.getItems().addAll("FT", "FEB", "FKIP", "FK", "FISIP", "FMIPA", "RKT");
         
@@ -227,7 +221,6 @@ public class HalamanKelolaBarang {
         Button btnUpload = new Button("Upload Gambar");
         selectedImageFile = null; 
 
-        // Logika Auto-Generate Kode
         if (barangEdit == null) {
             comboLokasi.setOnAction(e -> updateKodePreview(comboLokasi, comboKategori, kodePreview));
             comboKategori.setOnAction(e -> updateKodePreview(comboLokasi, comboKategori, kodePreview));
@@ -237,7 +230,6 @@ public class HalamanKelolaBarang {
             comboKategori.setDisable(true);
         }
 
-        // Logika Upload
         btnUpload.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Pilih Gambar Barang");
@@ -264,19 +256,19 @@ public class HalamanKelolaBarang {
 
         dialog.getDialogPane().setContent(grid);
 
-        // --- LOGIKA AGAR DIALOG TIDAK TUTUP SAAT ERROR ---
-        // Ambil tombol Simpan dari dialog
         Button btnSimpan = (Button) dialog.getDialogPane().lookupButton(btnSaveType);
         
-        // Tambahkan EventFilter. Ini akan menangkap klik SEBELUM dialog menutup dirinya.
         btnSimpan.addEventFilter(ActionEvent.ACTION, event -> {
             try {
-                // Validasi Input
                 if (barangEdit == null && (comboLokasi.getValue() == null || comboKategori.getValue() == null)) {
                     throw new IllegalArgumentException("Lokasi dan Kategori harus dipilih!");
                 }
                 if (nama.getText().trim().isEmpty() || stok.getText().trim().isEmpty()) {
                     throw new IllegalArgumentException("Nama dan Stok harus diisi!");
+                }
+                
+                if (barangEdit == null && selectedImageFile == null) {
+                    throw new IllegalArgumentException("Gambar barang wajib diupload!");
                 }
                 
                 int stokInt;
@@ -286,10 +278,8 @@ public class HalamanKelolaBarang {
                     throw new IllegalArgumentException("Stok harus berupa angka!");
                 }
                 
-                // Jika lolos validasi, lanjutkan proses simpan
                 String finalKode = kodePreview.getText();
                 
-                // Handle Image Path
                 String finalPath = barangEdit != null ? barangEdit.getPathGambar() : "";
                 if (selectedImageFile != null) {
                     finalPath = inventarisService.uploadImage(selectedImageFile);
@@ -304,17 +294,14 @@ public class HalamanKelolaBarang {
                 }
                 
                 refreshTable();
-                // Dialog akan tertutup otomatis setelah method ini selesai karena kita TIDAK memanggil event.consume() di sini.
 
             } catch (IllegalArgumentException ex) {
-                // Jika ada error, tampilkan alert DAN cegah dialog tertutup
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
                 alert.setContentText(ex.getMessage());
                 alert.show();
-                
-                event.consume(); // INI KUNCINYA: Membatalkan event penutupan dialog
+                event.consume(); 
             }
         });
 

@@ -70,17 +70,30 @@ public class InventarisService {
     }
 
     private void saveToJson(String fileName, Object data) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        
         try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String path = getClass().getResource("/" + fileName).getPath();
-            if (path.startsWith("/") && System.getProperty("os.name").toLowerCase().contains("win")) {
-                path = path.substring(1);
+            String pathTarget = getClass().getResource("/" + fileName).getPath();
+            if (pathTarget.startsWith("/") && System.getProperty("os.name").toLowerCase().contains("win")) {
+                pathTarget = pathTarget.substring(1);
             }
-            try (Writer writer = new FileWriter(path)) {
+            try (Writer writer = new FileWriter(pathTarget)) {
                 gson.toJson(data, writer);
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        try {
+            File srcFile = new File("src/main/resources/" + fileName);
+            if (srcFile.exists()) {
+                try (Writer writer = new FileWriter(srcFile)) {
+                    gson.toJson(data, writer);
+                    System.out.println("Data tersimpan permanen di: " + srcFile.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal menyimpan ke SRC (Mungkin bukan mode dev): " + e.getMessage());
         }
     }
 
@@ -108,15 +121,11 @@ public class InventarisService {
         
         try {
             String fileName = sourceFile.getName();
-            String destDir = "src/main/resources/images/";
             
-            File destFolder = new File(destDir);
-            if (!destFolder.exists()) {
-                destFolder.mkdirs();
-            }
-
-            File destFile = new File(destDir + fileName);
-            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            File srcImagesDir = new File("src/main/resources/images/");
+            if (!srcImagesDir.exists()) srcImagesDir.mkdirs();
+            File srcDestFile = new File(srcImagesDir, fileName);
+            Files.copy(sourceFile.toPath(), srcDestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
             String targetDir = getClass().getResource("/").getPath();
             if (targetDir.startsWith("/") && System.getProperty("os.name").toLowerCase().contains("win")) {
@@ -124,7 +133,6 @@ public class InventarisService {
             }
             File targetImagesDir = new File(targetDir + "images/");
             if (!targetImagesDir.exists()) targetImagesDir.mkdirs();
-            
             File targetDestFile = new File(targetImagesDir, fileName);
             Files.copy(sourceFile.toPath(), targetDestFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
