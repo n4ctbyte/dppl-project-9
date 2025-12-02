@@ -5,12 +5,14 @@ public class User {
     private String password;
     private String role;
     private String nama;
+    private String profile;
 
-    public User(String email, String password, String role, String nama) {
+    public User(String email, String password, String role, String nama, String profile) {
         this.email = email;
         this.password = password;
         this.role = role;
         this.nama = nama;
+        this.profile = profile;
     }
 
     public String getEmail() {
@@ -43,5 +45,13 @@ public class User {
 
     public void setNama(String nama) {
         this.nama = nama;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 }

@@ -6,20 +6,25 @@ import app.view.HalamanKelolaBarang;
 import app.view.HalamanLogin;
 import app.view.HalamanRiwayat;
 import app.view.HalamanStatistik;
+import app.model.User;
+import java.io.InputStream;
+import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 public class SiurApp extends Application {
@@ -33,6 +38,11 @@ public class SiurApp extends Application {
     private HalamanRiwayat halamanRiwayat;
     private HalamanKelolaBarang halamanKelolaBarang;
     private HalamanStatistik halamanStatistik;
+    
+    private Button btnInventaris;
+    private Button btnRiwayat;
+    private Button btnKelola;
+    private Button btnStatistik;
 
     @Override
     public void start(Stage primaryStage) {
@@ -48,40 +58,120 @@ public class SiurApp extends Application {
         this.halamanStatistik = new HalamanStatistik(this);
 
         this.rootLayout = new BorderPane();
-        this.rootLayout.setStyle("-fx-background-color: #f5f7fa;");
-
+        
         showLoginPage();
 
         Scene scene = new Scene(rootLayout);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
+    private Node createHeader() {
+        HBox header = new HBox(15);
+        header.getStyleClass().add("header-bar");
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(15));
+
+        Label title = new Label("Sistem Inventaris Universitas Riau - SIUR");
+        title.getStyleClass().add("label-title");
+        title.setStyle("-fx-font-size: 20px;"); 
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        String namaUser = "Guest";
+        if (authService.getUserAktif() != null) {
+            namaUser = "Halo, " + authService.getUserAktif().getNama();
+        }
+        Label lblUser = new Label(namaUser);
+        lblUser.setStyle("-fx-font-weight: bold; -fx-text-fill: #333333; -fx-font-size: 14px;");
+
+        Button btnLogout = new Button("Logout");
+        btnLogout.getStyleClass().add("btn-logout");
+        btnLogout.setOnAction(e -> doLogout());
+
+        header.getChildren().addAll(title, spacer, lblUser, btnLogout);
+        return header;
+    }
+
     private Node createSidebar() {
         VBox sidebar = new VBox(10);
-        sidebar.setPadding(new Insets(20));
-        sidebar.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 2, 4);");
+        sidebar.getStyleClass().add("sidebar");
         sidebar.setMinWidth(240);
         sidebar.setMaxWidth(240);
         BorderPane.setMargin(sidebar, new Insets(15));
 
-        Label title = new Label("SIUR");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        title.setTextFill(Color.web("#2E3348"));
-        VBox.setMargin(title, new Insets(0, 0, 20, 0));
+        VBox profileBox = new VBox(5);
+        profileBox.setAlignment(Pos.CENTER);
+        profileBox.setPadding(new Insets(0, 0, 10, 0));
 
-        Button btnInventaris = createNavButton("Inventaris");
-        Button btnRiwayat = createNavButton("Riwayat");
-        Button btnKelola = createNavButton("Kelola Barang");
-        Button btnStatistik = createNavButton("Statistik");
+        Circle avatar = new Circle(35);
+        avatar.setStroke(Color.web("#4A90E2"));
+        avatar.setStrokeWidth(2);
+        
+        User currentUser = authService.getUserAktif();
+        String namaUser = "Guest";
+        String roleUser = "";
+        
+        String imgPath = "images/profile.png"; 
+
+        if (currentUser != null) {
+            namaUser = currentUser.getNama();
+            roleUser = currentUser.getRole();
+            
+            if (currentUser.getProfile() != null && !currentUser.getProfile().isEmpty()) {
+                imgPath = currentUser.getProfile();
+            }
+        }
+
+        try {
+            InputStream is = getClass().getResourceAsStream("/" + imgPath);
+            
+            if (is != null) {
+                avatar.setFill(new ImagePattern(new Image(is)));
+            } else {
+                InputStream defaultIs = getClass().getResourceAsStream("/images/profile.png");
+                if (defaultIs != null) {
+                    avatar.setFill(new ImagePattern(new Image(defaultIs)));
+                } else {
+                    avatar.setFill(Color.WHITE);
+                }
+            }
+        } catch (Exception e) {
+            avatar.setFill(Color.WHITE);
+        }
+
+        Label lblNama = new Label(namaUser);
+        lblNama.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2E3348; -fx-wrap-text: true; -fx-text-alignment: center;");
+        
+        Label lblRole = new Label(roleUser);
+        lblRole.setStyle("-fx-font-size: 12px; -fx-text-fill: #757575; -fx-background-color: #E0E0E0; -fx-padding: 2 8; -fx-background-radius: 10;");
+
+        profileBox.getChildren().addAll(avatar, lblNama, lblRole);
+        
+        Separator separator = new Separator();
+        separator.setPadding(new Insets(10, 0, 10, 0));
+
+        btnInventaris = createNavButton("Inventaris");
+        btnRiwayat = createNavButton("Riwayat");
+        btnKelola = createNavButton("Kelola Barang");
+        btnStatistik = createNavButton("Statistik");
         
         btnInventaris.setOnAction(e -> showInventarisPage());
         btnRiwayat.setOnAction(e -> showRiwayatPage());
-        btnKelola.setOnAction(e -> rootLayout.setCenter(halamanKelolaBarang.getView()));
-        btnStatistik.setOnAction(e -> rootLayout.setCenter(halamanStatistik.getView()));
+        btnKelola.setOnAction(e -> {
+            updateCenterContent(halamanKelolaBarang.getView());
+            setActiveButton(btnKelola);
+        });
+        btnStatistik.setOnAction(e -> {
+            updateCenterContent(halamanStatistik.getView());
+            setActiveButton(btnStatistik);
+        });
 
-        sidebar.getChildren().addAll(btnInventaris, btnRiwayat);
+        sidebar.getChildren().addAll(profileBox, separator, btnInventaris, btnRiwayat);
 
         if (authService.isAdmin()) {
             sidebar.getChildren().addAll(btnKelola, btnStatistik);
@@ -94,15 +184,33 @@ public class SiurApp extends Application {
         Button button = new Button(text);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
-        String styleIdle = "-fx-background-color: #F8F8F8; -fx-background-radius: 8; -fx-text-fill: #2E3348; -fx-font-size: 14px; -fx-padding: 10; -fx-alignment: center-left; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 1, 1);";
-        String styleHover = "-fx-background-color: #E3F2FD; -fx-background-radius: 8; -fx-text-fill: #0B5ED7; -fx-font-size: 14px; -fx-padding: 10; -fx-alignment: center-left; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 1, 1); -fx-font-weight: bold;";
-        button.setStyle(styleIdle);
-        button.setOnMouseEntered(e -> button.setStyle(styleHover));
-        button.setOnMouseExited(e -> button.setStyle(styleIdle));
+        button.getStyleClass().add("btn-sidebar");
         return button;
+    }
+    
+    private void setActiveButton(Button activeButton) {
+        resetButtonStyle(btnInventaris);
+        resetButtonStyle(btnRiwayat);
+        if (btnKelola != null) resetButtonStyle(btnKelola);
+        if (btnStatistik != null) resetButtonStyle(btnStatistik);
+        
+        activeButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
+    }
+    
+    private void resetButtonStyle(Button btn) {
+        if (btn != null) {
+            btn.setStyle("");
+        }
+    }
+
+    private void updateCenterContent(Node content) {
+        rootLayout.setTop(createHeader());
+        rootLayout.setLeft(createSidebar());
+        rootLayout.setCenter(content);
     }
 
     public void showLoginPage() {
+        rootLayout.setTop(null);
         rootLayout.setLeft(null);
         rootLayout.setCenter(halamanLogin.getView());
     }
@@ -113,14 +221,14 @@ public class SiurApp extends Application {
     }
 
     public void showInventarisPage() {
-        rootLayout.setLeft(createSidebar());
-        rootLayout.setCenter(halamanInventaris.getView());
+        updateCenterContent(halamanInventaris.getView());
+        setActiveButton(btnInventaris); 
     }
     
     public void showRiwayatPage() {
-        rootLayout.setLeft(createSidebar());
         halamanRiwayat.loadRiwayatData();
-        rootLayout.setCenter(halamanRiwayat.getView());
+        updateCenterContent(halamanRiwayat.getView());
+        setActiveButton(btnRiwayat);
     }
 
     public static void main(String[] args) {

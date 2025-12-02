@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "kode": "FT-ATK-001",
+    "nama": "Spidol Merah",
+    "stok": 100,
+    "pathGambar": "images/spidol.png"
+  },
+  {
+    "kode": "FEB-ELK-001",
+    "nama": "Microphone",
+    "stok": 10,
+    "pathGambar": "images/microphone.png"
+  },
+  {
+    "kode": "FKIP-ELK-001",
+    "nama": "Speaker",
+    "stok": 50,
+    "pathGambar": "images/speaker.png"
+  },
+  {
+    "kode": "FT-ATK-002",
+    "nama": "Spidol Hitam",
+    "stok": 150,
+    "pathGambar": "images/spidol hitam.png"
+  },
+  {
+    "kode": "FT-ELK-001",
+    "nama": "Cok Sambung",
+    "stok": 10,
+    "pathGambar": "images/cok sambung.png"
+  }
+]

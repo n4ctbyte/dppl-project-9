@@ -1,26 +1,34 @@
 [
   {
     "email": "admin@admin.unri.ac.id",
-    "password": "admin123",
+    "password": "$2a$12$r1HtBkNhDSYmMzVA3JHHZOwysJRO.Z.9vaZPK/iyT4rvzY496cpjS",
     "role": "ADMIN",
-    "nama": "Administrator SIUR"
+    "nama": "Administrator SIUR",
+    "pw": "admin123",
+    "profile": "images/profile.png"
   },
   {
     "email": "nakata.christian2366@student.unri.ac.id",
-    "password": "Nakata2366!",
+    "password": "$2a$12$l4pumP0m8bM9Y31RB0E9aO3NaVuLCZP3ewom.B8R6q0DvPsbmP6N2",
     "role": "USER",
-    "nama": "Nakata Christian"
+    "nama": "Nakata Christian",
+    "pw": "Nakata2503!",
+    "profile": "images/profile.png"
   },
   {
     "email": "test",
-    "password": "test",
+    "password": "$2a$12$8AFIWic8hYseaTleQ3YsYOV46Mysxi84V41DKKqV16V.h5xWqmATu",
     "role": "USER",
-    "nama": "Nakata Christian"
+    "nama": "Test User",
+    "pw": "test",
+    "profile": "images/profile.png"
   },
   {
     "email": "admin",
-    "password": "admin",
+    "password": "$2a$12$xMWNOqmjoOUV1dpKtJVIsOqpsVBcJY/Zdbp5JR.2SqyklIr0.VqOi",
     "role": "ADMIN",
-    "nama": "Administrator SIUR"
-  } 
+    "nama": "Administrator SIUR",
+    "pw": "admin",
+    "profile": "images/profile.png"
+  }
 ]

@@ -4,7 +4,6 @@ import app.SiurApp;
 import app.model.Barang;
 import app.service.InventarisService;
 import java.io.File;
-import java.util.Optional;
 import javafx.animation.ScaleTransition;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -18,8 +17,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -38,30 +35,20 @@ public class HalamanKelolaBarang {
     public Node getView() {
         VBox contentContainer = new VBox(20);
         contentContainer.setPadding(new Insets(25));
-        contentContainer.setStyle("-fx-background-color: #f5f7fa;");
 
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
-        
-        Label title = new Label("Kelola Barang");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-        title.setStyle("-fx-text-fill: #2E3348;");
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         
         Button btnTambah = new Button("＋ Tambah Barang");
-        
-        String styleTambah = "-fx-background-color: #4A90E2; -fx-background-radius: 8; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-padding: 10 20; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(74,144,226,0.4), 8, 0, 0, 2); -fx-cursor: hand; -fx-border-color: transparent; -fx-border-width: 1.5; -fx-border-radius: 8;";
-
-        String styleTambahHover = "-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-text-fill: #4A90E2; -fx-font-size: 14px; -fx-padding: 10 20; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(74,144,226,0.4), 8, 0, 0, 2); -fx-cursor: hand; -fx-border-color: #4A90E2; -fx-border-width: 1.5; -fx-border-radius: 8;";
-        
-        btnTambah.setStyle(styleTambah);
-        setupButtonHoverEffect(btnTambah, 1.05, styleTambah, styleTambahHover);
+        btnTambah.getStyleClass().add("btn-invert-blue");
+        setupButtonScaleAnimation(btnTambah, 1.05);
         
         btnTambah.setOnAction(e -> showFormDialog(null));
         
-        header.getChildren().addAll(title, spacer, btnTambah);
+        header.getChildren().addAll(spacer, btnTambah);
 
         setupTableView();
         refreshTable();
@@ -72,7 +59,7 @@ public class HalamanKelolaBarang {
         return contentContainer;
     }
 
-    private void setupButtonHoverEffect(Node node, double scale, String styleIdle, String styleHover) {
+    private void setupButtonScaleAnimation(Node node, double scale) {
         ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
         stIn.setToX(scale);
         stIn.setToY(scale);
@@ -81,16 +68,10 @@ public class HalamanKelolaBarang {
         stOut.setToX(1.0);
         stOut.setToY(1.0);
         
-        node.setOnMouseEntered(e -> {
-            node.setStyle(styleHover);
-            stIn.playFromStart();
-        });
-        node.setOnMouseExited(e -> {
-            node.setStyle(styleIdle);
-            stOut.playFromStart();
-        });
+        node.setOnMouseEntered(e -> stIn.playFromStart());
+        node.setOnMouseExited(e -> stOut.playFromStart());
     }
-
+    
     private void setupButtonScaleOnly(Node node) {
         ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
         stIn.setToX(1.15);
@@ -107,7 +88,6 @@ public class HalamanKelolaBarang {
     private void setupTableView() {
         tableView = new TableView<>();
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tableView.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);");
 
         TableColumn<Barang, String> colKode = new TableColumn<>("Kode");
         colKode.setCellValueFactory(new PropertyValueFactory<>("kode"));
@@ -132,14 +112,11 @@ public class HalamanKelolaBarang {
             {
                 pane.setAlignment(Pos.CENTER);
                 
-                String styleEdit = "-fx-background-color: #FFC107; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; -fx-max-width: 35px; -fx-max-height: 35px; -fx-cursor: hand;";
-                String styleHapus = "-fx-background-color: #FF5252; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; -fx-max-width: 35px; -fx-max-height: 35px; -fx-cursor: hand;";
-
-                btnEdit.setStyle(styleEdit);
+                btnEdit.getStyleClass().add("btn-icon-edit");
                 btnEdit.setTooltip(new Tooltip("Edit Data"));
                 setupButtonScaleOnly(btnEdit);
                 
-                btnHapus.setStyle(styleHapus);
+                btnHapus.getStyleClass().add("btn-icon-delete");
                 btnHapus.setTooltip(new Tooltip("Hapus Barang"));
                 setupButtonScaleOnly(btnHapus);
                 

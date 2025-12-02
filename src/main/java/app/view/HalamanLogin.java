@@ -1,26 +1,23 @@
 package app.view;
 
 import app.SiurApp;
-import app.model.User;
 import app.service.AuthService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import java.io.InputStream;
 
 public class HalamanLogin {
 
@@ -38,14 +35,28 @@ public class HalamanLogin {
         VBox mainContainer = new VBox(15);
         mainContainer.setAlignment(Pos.CENTER);
         mainContainer.setPadding(new Insets(30, 35, 30, 35));
-        mainContainer.setStyle("-fx-background-color: #F0F0F0;");
         mainContainer.setMaxSize(380, 620);
+        
         mainContainer.getStyleClass().add("login-container");
 
         Circle avatar = new Circle(60);
-        avatar.setFill(Color.WHITE);
-        avatar.setStroke(Color.LIGHTGRAY);
-        avatar.setStrokeWidth(2);
+        avatar.setStroke(Color.WHITE);
+        avatar.setStrokeWidth(3);
+    
+        try {
+            InputStream is = getClass().getResourceAsStream("/images/logo.png");
+            if (is != null) {
+                Image logoImage = new Image(is);
+                avatar.setFill(new ImagePattern(logoImage));
+            } else {
+                System.err.println("Logo tidak ditemukan di src/main/resources/images/logo.png");
+                avatar.setFill(Color.WHITE); 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            avatar.setFill(Color.WHITE);
+        }
+        
         VBox.setMargin(avatar, new Insets(15, 0, 15, 0));
 
         Label titleLabel = new Label("Sistem Inventaris Universitas Riau");
@@ -63,27 +74,19 @@ public class HalamanLogin {
         emailField.setPromptText("Alamat Email");
         emailField.setMaxWidth(300);
         emailField.setPrefHeight(45);
-        emailField.setStyle(
-                "-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 13px; -fx-padding: 10 15 10 15;");
         VBox.setMargin(emailField, new Insets(8, 0, 0, 0));
 
         passwordField = new PasswordField();
         passwordField.setPromptText("Password");
         passwordField.setMaxWidth(300);
         passwordField.setPrefHeight(45);
-        passwordField.setStyle(
-                "-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 13px; -fx-padding: 10 15 10 15;");
 
         emailField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                handleLogin();
-            }
+            if (event.getCode() == KeyCode.ENTER) handleLogin();
         });
 
         passwordField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                handleLogin();
-            }
+            if (event.getCode() == KeyCode.ENTER) handleLogin();
         });
 
         HBox rememberForgotBox = new HBox();
@@ -98,12 +101,7 @@ public class HalamanLogin {
         forgotPasswordLabel.setFont(Font.font("Arial", 11));
         forgotPasswordLabel.setTextFill(Color.web("#333333"));
         forgotPasswordLabel.setStyle("-fx-cursor: hand;");
-        forgotPasswordLabel.setOnMouseEntered(e -> forgotPasswordLabel.setTextFill(Color.BLUE));
-        forgotPasswordLabel.setOnMouseExited(e -> forgotPasswordLabel.setTextFill(Color.web("#333333")));
-        forgotPasswordLabel.setOnMouseClicked(e -> {
-            showAlert(Alert.AlertType.INFORMATION, "Lupa Password", "Silakan hubungi administrator untuk reset password.");
-        });
-
+        
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         rememberForgotBox.getChildren().addAll(rememberCheckBox, spacer, forgotPasswordLabel);
@@ -111,23 +109,13 @@ public class HalamanLogin {
         Button loginButton = new Button("MASUK");
         loginButton.setMaxWidth(300);
         loginButton.setPrefHeight(45);
-        loginButton.setFont(Font.font("Arial", FontWeight.BOLD, 15));
-        loginButton.setStyle(
-                "-fx-background-color: #4A90E2; -fx-text-fill: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-cursor: hand;");
-        loginButton.setOnMouseEntered(e -> loginButton.setStyle(
-                "-fx-background-color: #357ABD; -fx-text-fill: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-cursor: hand;"));
-        loginButton.setOnMouseExited(e -> loginButton.setStyle(
-                "-fx-background-color: #4A90E2; -fx-text-fill: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-cursor: hand;"));
-
+        loginButton.getStyleClass().add("btn-primary");
         loginButton.setOnAction(e -> handleLogin());
 
         Label helpLabel = new Label("Butuh bantuan? Hubungi kami di sini!");
         helpLabel.setFont(Font.font("Arial", 12));
-        helpLabel.setAlignment(Pos.CENTER);
+        helpLabel.setUnderline(true);
         helpLabel.setStyle("-fx-cursor: hand;");
-        helpLabel.setOnMouseClicked(e -> {
-            showAlert(Alert.AlertType.INFORMATION, "Hubungi Kami", "Email: support@unri.ac.id\nTelepon: (0761) 123456");
-        });
         VBox.setMargin(helpLabel, new Insets(8, 0, 0, 0));
 
         Label footerLabel = new Label("2024 Universitas Riau. All rights reserved.");
@@ -140,7 +128,8 @@ public class HalamanLogin {
 
         VBox wrapper = new VBox(mainContainer);
         wrapper.setAlignment(Pos.CENTER);
-        wrapper.setStyle("-fx-background-color: #DCDCDC;");
+        wrapper.getStyleClass().add("login-wrapper");
+        
         return wrapper;
     }
 
@@ -148,30 +137,15 @@ public class HalamanLogin {
         String email = emailField.getText().trim();
         String password = passwordField.getText();
 
-        if (email.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Silakan masukkan alamat email!");
+        if (email.isEmpty() || password.isEmpty()) {
+            new Alert(Alert.AlertType.ERROR, "Email dan Password harus diisi!").show();
             return;
         }
 
-        if (password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Silakan masukkan password!");
-            return;
-        }
-
-        boolean loginSuccess = authService.login(email, password);
-
-        if (loginSuccess) {
+        if (authService.login(email, password)) {
             mainApp.showInventarisPage();
         } else {
-            showAlert(Alert.AlertType.ERROR, "Error", "Email atau password salah.");
+            new Alert(Alert.AlertType.ERROR, "Email atau password salah.").show();
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

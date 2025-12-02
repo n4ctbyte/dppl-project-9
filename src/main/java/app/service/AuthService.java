@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
 
@@ -56,11 +57,14 @@ public class AuthService {
     }
 
     public boolean login(String email, String password) {
-        
+        System.out.println("[DEV] Hash untuk '" + password + "' adalah: " + BCrypt.hashpw(password, BCrypt.gensalt()));
+
         for (User user : userDatabase) {
-            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(password)) {
-                userAktif = user;
-                return true;
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                if (BCrypt.checkpw(password, user.getPassword())) {
+                    userAktif = user;
+                    return true;
+                }
             }
         }
 

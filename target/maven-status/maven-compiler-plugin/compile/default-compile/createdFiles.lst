@@ -5,6 +5,7 @@ app\model\Peminjaman.class
 app\model\Barang.class
 app\view\HalamanLogin.class
 app\view\HalamanKelolaBarang.class
+app\view\HalamanRiwayat$1.class
 app\view\HalamanStatistik.class
 app\view\HalamanStatistik$1.class
 app\model\Penghapusan.class
@@ -17,4 +18,5 @@ app\view\HalamanInventaris.class
 app\model\User.class
 app\service\AuthService.class
 app\service\InventarisService$1.class
+app\view\HalamanRiwayat$2.class
 app\view\HalamanKelolaBarang$1.class

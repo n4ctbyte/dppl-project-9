@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -41,16 +42,11 @@ public class HalamanStatistik {
     public Node getView() {
         VBox contentContainer = new VBox(20);
         contentContainer.setPadding(new Insets(25));
-        contentContainer.setStyle("-fx-background-color: #f5f7fa;");
-
-        Label title = new Label("Statistik & Laporan");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-        title.setStyle("-fx-text-fill: #2E3348;");
 
         HBox filterBox = new HBox(15);
         filterBox.setPadding(new Insets(15));
-        filterBox.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);");
-        filterBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        filterBox.getStyleClass().add("filter-box");
+        filterBox.setAlignment(Pos.CENTER_LEFT);
 
         Label lblInterval = new Label("Pilih Interval:");
         lblInterval.setFont(Font.font("Arial", FontWeight.BOLD, 14));
@@ -73,13 +69,8 @@ public class HalamanStatistik {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         
         Button btnPdf = new Button("Unduh Laporan PDF");
-        
-        String stylePdf = "-fx-background-color: #D32F2F; -fx-background-radius: 8; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-padding: 8 15; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand; -fx-border-color: transparent; -fx-border-width: 1.5; -fx-border-radius: 8;";
-        
-        String stylePdfHover = "-fx-background-color: #FFFFFF; -fx-background-radius: 8; -fx-text-fill: #D32F2F; -fx-font-size: 14px; -fx-padding: 8 15; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-cursor: hand; -fx-border-color: #D32F2F; -fx-border-width: 1.5; -fx-border-radius: 8;";
-        
-        btnPdf.setStyle(stylePdf);
-        setupButtonHoverEffect(btnPdf, 1.05, stylePdf, stylePdfHover);
+        btnPdf.getStyleClass().add("btn-invert-red");
+        setupButtonScaleAnimation(btnPdf, 1.05);
         
         btnPdf.setOnAction(e -> downloadPdf());
 
@@ -112,17 +103,17 @@ public class HalamanStatistik {
         barChart = new BarChart<>(xAxis, yAxis);
         barChart.setTitle("Tren Peminjaman Barang");
         barChart.setLegendVisible(false);
-        barChart.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);");
+        barChart.getStyleClass().add("card-item");
         
         refreshChart();
 
-        contentContainer.getChildren().addAll(title, filterBox, barChart);
+        contentContainer.getChildren().addAll(filterBox, barChart);
         VBox.setVgrow(barChart, Priority.ALWAYS);
         
         return contentContainer;
     }
     
-    private void setupButtonHoverEffect(Node node, double scale, String styleIdle, String styleHover) {
+    private void setupButtonScaleAnimation(Node node, double scale) {
         ScaleTransition stIn = new ScaleTransition(Duration.millis(150), node);
         stIn.setToX(scale);
         stIn.setToY(scale);
@@ -131,14 +122,8 @@ public class HalamanStatistik {
         stOut.setToX(1.0);
         stOut.setToY(1.0);
         
-        node.setOnMouseEntered(e -> {
-            node.setStyle(styleHover);
-            stIn.playFromStart();
-        });
-        node.setOnMouseExited(e -> {
-            node.setStyle(styleIdle);
-            stOut.playFromStart();
-        });
+        node.setOnMouseEntered(e -> stIn.playFromStart());
+        node.setOnMouseExited(e -> stOut.playFromStart());
     }
     
     private LocalDate calculateStartDate(String interval) {

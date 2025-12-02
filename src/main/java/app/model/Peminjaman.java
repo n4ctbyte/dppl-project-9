@@ -13,12 +13,14 @@ public class Peminjaman {
     private String waktuPeminjaman;
     private String waktuPengembalian;
     private String catatan;
+    private int getJumlahHabisPakai;
 
     public Peminjaman(User user, Barang barang, int jumlah, String alasan) {
         this.user = user;
         this.barang = barang;
         this.jumlahAwal = jumlah;
         this.jumlahSisa = jumlah;
+        this.getJumlahHabisPakai = 0;
         this.alasan = alasan;
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -62,6 +64,12 @@ public class Peminjaman {
 
     public void setJumlahSisa(int jumlahSisa) {
         this.jumlahSisa = jumlahSisa;
+    }
+
+    public int getJumlahHabisPakai() { return getJumlahHabisPakai; }
+
+    public void setJumlahHabisPakai(int JumlahHabisPakai) {
+        this.getJumlahHabisPakai = JumlahHabisPakai;
     }
 
     public void setWaktuPengembalian(String waktuPengembalian) {

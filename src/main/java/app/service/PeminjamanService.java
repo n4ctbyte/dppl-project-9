@@ -6,12 +6,12 @@ import app.model.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class PeminjamanService {
 
     private static PeminjamanService instance;
     private List<Peminjaman> semuaPeminjaman;
-    private final String JSON_PATH = "peminjaman.json";
+    private final String JSON_FILENAME = "peminjaman.json";
 
     private PeminjamanService() {
         loadPeminjaman();
@@ -36,57 +36,66 @@ public class PeminjamanService {
     }
 
     private void loadPeminjaman() {
+        this.semuaPeminjaman = new ArrayList<>();
         try {
-            Gson gson = new Gson();
-            Type peminjamanListType = new TypeToken<List<Peminjaman>>(){}.getType();
+            File targetFile = new File("target/classes/" + JSON_FILENAME);
 
-            InputStream is = getClass().getResourceAsStream("/" + JSON_PATH);
-
-            if (is == null) {
-                System.err.println("File " + JSON_PATH + " tidak ditemukan, membuat list baru.");
-                this.semuaPeminjaman = new ArrayList<>();
-                return;
+            if (targetFile.exists()) {
+                Gson gson = new Gson();
+                Reader reader = new java.io.FileReader(targetFile);
+                this.semuaPeminjaman = gson.fromJson(reader, new TypeToken<List<Peminjaman>>(){}.getType());
+                reader.close();
             }
-
-            Reader reader = new InputStreamReader(is);
-            this.semuaPeminjaman = gson.fromJson(reader, peminjamanListType);
-
+            
             if (this.semuaPeminjaman == null) {
                 this.semuaPeminjaman = new ArrayList<>();
             }
-            
-            System.out.println("PeminjamanService: Berhasil memuat " + semuaPeminjaman.size() + " riwayat peminjaman.");
-
         } catch (Exception e) {
-            System.err.println("Gagal membaca " + JSON_PATH + ": " + e.getMessage());
             this.semuaPeminjaman = new ArrayList<>();
         }
     }
 
     private void savePeminjaman() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        
         try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String path = getClass().getResource("/" + JSON_PATH).getPath();
-            
-            if (path.startsWith("/") && System.getProperty("os.name").toLowerCase().contains("win")) {
-                path = path.substring(1);
+            File targetFile = new File("target/classes/" + JSON_FILENAME);
+            if (!targetFile.getParentFile().exists()) {
+                targetFile.getParentFile().mkdirs();
             }
-
-            Writer writer = new FileWriter(path);
+            Writer writer = new FileWriter(targetFile);
             gson.toJson(this.semuaPeminjaman, writer);
             writer.close();
-            
-            System.out.println("PeminjamanService: Berhasil menyimpan data ke " + JSON_PATH);
-            
         } catch (Exception e) {
-            System.err.println("Gagal menyimpan ke " + JSON_PATH + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        try {
+            File srcFile = new File("src/main/resources/" + JSON_FILENAME);
+            if (srcFile.exists()) {
+                Writer writer = new FileWriter(srcFile);
+                gson.toJson(this.semuaPeminjaman, writer);
+                writer.close();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void catatPeminjaman(User user, Barang barang, int jumlah, String alasan) {
         Peminjaman peminjamanBaru = new Peminjaman(user, barang, jumlah, alasan);
+        
         semuaPeminjaman.add(peminjamanBaru);
+        savePeminjaman();
+    }
+    
+    public void hapusRiwayat(Peminjaman peminjaman) {
+        semuaPeminjaman.remove(peminjaman);
+        savePeminjaman();
+    }
+
+    public void hapusSemuaRiwayat() {
+        semuaPeminjaman.clear();
         savePeminjaman();
     }
     
@@ -101,7 +110,7 @@ public class PeminjamanService {
                 .collect(Collectors.toList());
     }
 
-    public boolean kembalikanPeminjaman(Peminjaman peminjaman, int jumlahKembali, String catatan) {
+    public boolean kembalikanPeminjaman(Peminjaman peminjaman, int jumlahKembali, String catatan, boolean isHabisPakai) {
         if (jumlahKembali > peminjaman.getJumlahSisa()) {
             return false;
         }
@@ -109,10 +118,19 @@ public class PeminjamanService {
         int jumlahSisaBaru = peminjaman.getJumlahSisa() - jumlahKembali;
         peminjaman.setJumlahSisa(jumlahSisaBaru);
         
+        if (isHabisPakai) {
+            peminjaman.setJumlahHabisPakai(peminjaman.getJumlahHabisPakai() + jumlahKembali);
+        }
+        
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         peminjaman.setWaktuPengembalian(LocalDateTime.now().format(formatter));
         
-        peminjaman.appendCatatan(catatan);
+        String catatanLengkap = catatan + " (" + jumlahKembali + ")";
+        if (isHabisPakai) {
+            catatanLengkap += " [HABIS]";
+        }
+        
+        peminjaman.appendCatatan(catatanLengkap);
         
         savePeminjaman();
         return true;

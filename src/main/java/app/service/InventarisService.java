@@ -89,11 +89,10 @@ public class InventarisService {
             if (srcFile.exists()) {
                 try (Writer writer = new FileWriter(srcFile)) {
                     gson.toJson(data, writer);
-                    System.out.println("Data tersimpan permanen di: " + srcFile.getAbsolutePath());
                 }
             }
         } catch (Exception e) {
-            System.err.println("Gagal menyimpan ke SRC (Mungkin bukan mode dev): " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -138,7 +137,6 @@ public class InventarisService {
 
             return "images/" + fileName;
         } catch (Exception e) {
-            e.printStackTrace();
             return "";
         }
     }
